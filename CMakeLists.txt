@@ -23,6 +23,7 @@ file(GLOB SRC_FILES
 file(GLOB TEST_FILES
     test/test_*.cpp
     test/test.cpp
+    test/test_sort.cpp
 )
 
 # 为每个 test_xxx.cpp 生成一个可执行文件

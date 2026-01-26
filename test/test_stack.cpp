@@ -1,5 +1,5 @@
-#include "console.h"
-#include "stack.h"
+#include "console.hpp"
+#include "stack.hpp"
 #include <iostream>
 #include <string>
 

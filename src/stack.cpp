@@ -1,4 +1,4 @@
-#include "stack.h"
+#include "stack.hpp"
 #include <stdexcept>
 
 Stack::Stack() : top_(-1) {}

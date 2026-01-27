@@ -4,20 +4,37 @@
 
 int main(){
     console_init();
+    auto arr = getRandomArr(0,30,10);
 
     // swap test
 
-    // std::vector<int> arr = {1,2,3,4};
-    // printVector(arr);
+    // printVector(arr,color::Type::Blue);
     // swap(&arr[1],&arr[2]);
-    // printVector(arr);
+    // printVector(arr,color::Type::Green);
     
     
     // bubbleSort test
 
-    auto arr = getRandomArr(0,20,10);
-    printVector(arr);
-    bubbleSort(arr);
-    printVector(arr);
+    // printVector(arr,color::Type::Blue);
+    // bubbleSort(arr);
+    // printVector(arr,color::Type::Green);
 
+
+    // selectSort test
+    
+    // printVector(arr,color::Type::Blue);
+    // selectSort(arr);
+    // printVector(arr,color::Type::Green);
+
+
+    // insertSort test
+
+    // printVector(arr,color::Type::Blue);
+    // insertSort(arr);
+    // printVector(arr,color::Type::Green);
+
+    // seerSort test
+    printVector(arr,color::Type::Blue);
+    seerSort(arr);
+    printVector(arr,color::Type::Green);
 }

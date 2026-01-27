@@ -39,10 +39,10 @@ inline void print(const T& value, color::Type c = color::Type::Default) {
 
 
 template <typename T,size_t N>
-inline void printArr(const T(&arr)[N]){
+inline void printArr(const T(&arr)[N],color::Type c = color::Type::Default){
     print("[");
     for(size_t i = 0;i < N;i++){
-        print(arr[i],color::Type::Blue);
+        print(arr[i],c);
         if (i != N-1){
             print(",");
         }
@@ -52,10 +52,10 @@ inline void printArr(const T(&arr)[N]){
 }
 
 template <typename T>
-inline void printVector(const std::vector<T>& vec){
+inline void printVector(const std::vector<T>& vec,color::Type c = color::Type::Default){
     print("[");
     for(size_t i = 0;i < vec.size();i++){
-        print(vec[i],color::Type::Blue);
+        print(vec[i],c);
         if (i != vec.size()-1){
             print(",");
         }

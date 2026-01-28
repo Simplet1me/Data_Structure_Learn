@@ -5,16 +5,28 @@
 
 int main() {
     console_init();
+    Stack<std::string> s;
+    s.push("aaa");
+    s.push("bbb");
+    s.push("ccc");
+    s.push("ddd");
 
-    Stack s;
-    s.push(1);
-    s.push(2);
+    s.list();
 
-    
-    print(s.top(),color::Type::Green);
-    std::cout << "\033[32m" << s.top() << "\033[0m\n";
+    println(s.top());
+
+    println("pop");
     s.pop();
-    std::cout << s.top() << "\n";
 
-    return 0;
+    s.list();
+    println(s.top());
+
+    println(s.isEmpty());
+
+    s.pop();
+    s.pop();
+    s.pop();
+
+    println(s.isEmpty());
+
 }

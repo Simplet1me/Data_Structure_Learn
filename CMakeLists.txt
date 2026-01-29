@@ -24,6 +24,7 @@ file(GLOB TEST_FILES
     test/test_*.cpp
     test/test.cpp
     test/test_sort.cpp
+    test/test_queue.cpp
 )
 
 # 为每个 test_xxx.cpp 生成一个可执行文件

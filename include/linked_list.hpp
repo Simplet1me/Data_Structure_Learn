@@ -36,14 +36,34 @@ public:
         while (p->next != nullptr){
             p = p->next;
         }
-
         p->next = newNode;
-        
     }
 
     void push_front(T t){
         node<T>* newNode = new node<T>(t,head);
         head = newNode;
+    }
+
+    int find(T t){
+        node<T>* p = head;
+        int index = 0;
+        while (p != nullptr){
+            if(p->value == t){
+                return index;
+            }
+            p = p->next;
+            index++;
+        }
+        return -1;
+    }
+
+    void insert(int index,T t){
+        node<T>* p = head;
+        for (size_t i = 0; i < index; i++){
+            p = p->next;
+        }
+        node<T>* newNode = new node<T>(t,p->next);
+        p->next = newNode;
     }
 
     void list(){
@@ -57,6 +77,26 @@ public:
         println("nullptr",color::Type::Blue);
     }
 
+    void pop_back(){
+        node<T>* p = head;
+        // 跑完为倒数第二节点
+        while (p->next->next != nullptr){
+            p = p->next;
+        }
+
+        // 从倒数第二节点自闭合
+        p->next = nullptr;
+        // 删除倒数第一节点
+        delete p->next;
+
+    }
+
+    void pop_front(){
+        node<T>* p = head->next;
+        delete head;
+        head = p;
+
+    }
 private:
     node<T>* head;
 

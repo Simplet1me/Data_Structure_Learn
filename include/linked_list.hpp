@@ -11,11 +11,11 @@ struct node{
 
 
 template <typename T>
-class linked_list{
+class Linked_List{
 public:
-    linked_list() : head(){};
-    linked_list(T t) : head(new node<T>(t)){};
-    ~linked_list(){
+    Linked_List() : head(){};
+    Linked_List(T t) : head(new node<T>(t)){};
+    ~Linked_List(){
         while (head != nullptr){
             node<T>* temp = head;
             head = head->next;

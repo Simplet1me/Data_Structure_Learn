@@ -3,7 +3,7 @@
 int main(){
     console_init();
 
-    linked_list<int> linklist(1);
+    Linked_List<int> linklist(1);
 
     linklist.list();
 

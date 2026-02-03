@@ -11,7 +11,7 @@ int main(){
     q.push("ccc");
     q.push("ddd");
 
-    q.list();
+    printVector(q.list(),color::Type::Green);
 
     println(q.top(),color::Type::Red);
 
@@ -19,7 +19,8 @@ int main(){
 
     q.pop();
 
-    q.list();
+    printVector(q.list(),color::Type::Green);
+
     println(q.top(),color::Type::Red);
 
     q.pop();

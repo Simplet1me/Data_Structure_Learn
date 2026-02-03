@@ -1,5 +1,4 @@
 #include <vector>
-#include "console.hpp"
 
 template <typename T>
 class Queue{
@@ -12,8 +11,8 @@ public:
         queue.erase(queue.begin() + 0);
     }
 
-    void list(){
-        printVector(queue,color::Type::Blue);
+    std::vector<T> list(){
+        return queue;
     }
 
     T top(){

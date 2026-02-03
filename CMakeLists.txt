@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 project(DataStructure)
 
+# 通过 vcpkg 查找 raylib
+find_package(raylib CONFIG REQUIRED)
+
 # 使用 MSVC 时的一些友好设置
 if (MSVC)
     add_compile_options(/W4)
@@ -48,4 +51,6 @@ foreach(test_file ${TEST_FILES})
             ${HEADER_FILES}
         )
     endif()
+    # 链接 raylib
+    target_link_libraries(${test_name} PRIVATE raylib)
 endforeach()

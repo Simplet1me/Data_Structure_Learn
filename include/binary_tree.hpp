@@ -8,8 +8,6 @@ struct treenode{
     treenode* right;
     treenode() : left(nullptr),right(nullptr){}
     treenode(T value) : value(value),left(nullptr),right(nullptr){}
-    treenode(T value,treenode* left) : value(value),left(left),right(nullptr){}
-    treenode(T value,treenode* left,treenode* right) : value(value),left(left),right(right){}
 };
 
 template <typename T>
@@ -19,6 +17,21 @@ public:
         father_node = new treenode<T>(value);
         father_node->left = nullptr;
         father_node->right = nullptr;
+    }
+
+    ~Binary_Tree(){
+        Queue<treenode<T>*> queue;
+        queue.push(father_node);
+        while (!queue.isEmpty()){
+            treenode<T>* node = queue.top();
+            if(node->left != nullptr){
+                queue.push(node->left);
+            }
+            if(node->right != nullptr){
+                queue.push(node->right);
+            }
+            delete node;
+        }
     }
 
     std::vector<T> preOrder(){

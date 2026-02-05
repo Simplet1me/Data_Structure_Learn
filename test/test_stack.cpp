@@ -1,7 +1,5 @@
 #include "console.hpp"
 #include "stack.hpp"
-#include <iostream>
-#include <string>
 
 int main() {
     console_init();

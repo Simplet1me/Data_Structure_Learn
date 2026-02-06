@@ -10,7 +10,11 @@ int main(){
     const int dy = 50;
 
     Map map(x,y,size);
-    map.summonMaze(1,1,175,95);
+    map.summonMaze(1,1,175,95,5,20,40);
+
+    auto path = map.bfsSreach({1,1},{175,95});
+
+    std::cout<<path.size()<<std::endl;
 
     std::vector<std::vector<int>> okpMap = map.getMap();
     
@@ -32,18 +36,19 @@ int main(){
             for (int index_x = 0; index_x < map.width; index_x++){
                 float x = dx + index_x * cellSize;
                 float y = dy + index_y * cellSize;
-                DrawRectangleLines((int)x, (int)y, (int)cellSize, (int)cellSize, LIGHTGRAY);
+                DrawRectangleLines((int)x, (int)y, (int)cellSize, (int)cellSize, BLACK);
                 if (okpMap[index_x][index_y] == 1){
                     DrawRectangle( dx + index_x * cellSize, dy + index_y * cellSize, (int)map.size, (int)map.size, BLACK);
                 }
             }
         }
 
+        for (auto p : path){
+            DrawRectangle( dx + p.first * cellSize, dy + p.second * cellSize, (int)map.size, (int)map.size, GREEN);
+        }
+
         DrawRectangle( dx + 1 * cellSize, dy + 1 * cellSize, (int)map.size, (int)map.size, RED);
         DrawRectangle( dx + 175 * cellSize, dy + 95 * cellSize, (int)map.size, (int)map.size, RED);
-
-
-
         
         EndDrawing();
     }

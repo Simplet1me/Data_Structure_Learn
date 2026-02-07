@@ -2,25 +2,54 @@
 #include <ctime>
 #include <cstdlib>
 #include <unordered_set>
+#include <queue>
 #include "queue.hpp"
 
-struct Point{
+struct bfsPoint{
     int x;
     int y;
-    float dis;
-    Point* parent;
-    Point(int x,int y) : x(x),y(y),dis(0.0f),parent(nullptr){}
+    bfsPoint* parent;
+    bfsPoint(int x,int y) : x(x),y(y),parent(nullptr){}
 
-    bool operator==(const Point& other) const {
+    bool operator==(const bfsPoint& other) const {
         return x == other.x && y == other.y;
     }
 
     struct Hash{
-        size_t operator()(const Point& n) const {
+        size_t operator()(const bfsPoint& n) const {
             return std::hash<int>()(n.x) ^ std::hash<int>()(n.y);
         }
     };
 };
+
+struct astarPoint{
+    int x;
+    int y;
+    float g;
+    float h;
+    float f;
+    astarPoint* parent;
+    astarPoint(int x,int y) : x(x),y(y),parent(nullptr){}
+
+    bool operator==(const astarPoint& other) const {
+        return x == other.x && y == other.y;
+    }
+
+    struct Hash{
+        size_t operator()(const astarPoint& n) const {
+            return std::hash<int>()(n.x) ^ std::hash<int>()(n.y);
+        }
+    };
+
+    struct compareMin {
+        bool operator()(astarPoint* a, astarPoint* b) {
+        return a->f > b->f; 
+    }
+};
+};
+
+
+
 
 class Map{
 public:
@@ -104,22 +133,21 @@ public:
     std::vector<std::pair<int,int>> bfsSreach(std::pair<int,int> start,std::pair<int,int> end){
         // openQueue存放将要访问的节点，clostList用来记录已经访问过的节点
         // allocated记录点内存，，用于结束搜索后的释放
-        Queue<Point*> openQueue;
-        std::unordered_set<Point,Point::Hash> clostList;
-        std::vector<Point*> allocated;
-        Point* start_point = new Point(start.first,start.second);
-        start_point->dis = 0;
+        Queue<bfsPoint*> openQueue;
+        std::unordered_set<bfsPoint,bfsPoint::Hash> clostList;
+        std::vector<bfsPoint*> allocated;
+        bfsPoint* start_bfsPoint = new bfsPoint(start.first,start.second);
 
         // 基本初始化 起始节点入队
-        allocated.push_back(start_point);
+        allocated.push_back(start_bfsPoint);
 
-        clostList.insert(*start_point);
-        openQueue.push(start_point);
+        clostList.insert(*start_bfsPoint);
+        openQueue.push(start_bfsPoint);
 
         while (!openQueue.isEmpty()){
 
             // 开放队列出队，第一个为起始节点
-            Point* current = openQueue.top();
+            bfsPoint* current = openQueue.top();
             openQueue.pop();
 
             // 如果遍历到了终点，终止循环，回溯路径并返回
@@ -130,7 +158,7 @@ public:
                     current = current->parent;
                 }
                 // 释放openList
-                for (Point* p : allocated){
+                for (bfsPoint* p : allocated){
                     delete p;
                 }
                 return path;
@@ -153,32 +181,119 @@ public:
                     // 定义一个临时点，然后在闭合队列里查重，没找到就是没访问过
                     // find函数会返回对应元素的迭代器，如果没有那就是end()
                     // if中为没找到，迭代器不为end() true
-                    Point probe(newX,newY);
+                    bfsPoint probe(newX,newY);
                     if(clostList.find(probe) != clostList.end()){
                         continue;
                     }
 
                     // 闭合列表中没有重复，那就记录下dis和parent，入队openQueue和clostlist，以及记录数组
-                    Point* newPoint = new Point(newX,newY);
-                    newPoint->dis = current->dis + 1;
-                    newPoint->parent = current;
-                    allocated.push_back(newPoint);
+                    bfsPoint* newbfsPoint = new bfsPoint(newX,newY);
+                    newbfsPoint->parent = current;
+                    allocated.push_back(newbfsPoint);
 
-                    clostList.insert(*newPoint);
-                    openQueue.push(newPoint);
+                    clostList.insert(*newbfsPoint);
+                    openQueue.push(newbfsPoint);
                 }  
             }
         }
 
         //没找到，清理队列退出
-        for (Point* p : allocated){
+        for (bfsPoint* p : allocated){
+            delete p;
+        }
+        return {};
+    }
+
+    //astar寻路
+    std::vector<std::pair<int,int>> astarSreach(std::pair<int,int> start,std::pair<int,int> end){
+        // openQueue存放将要访问的节点，clostList用来记录已经访问过的节点
+        // allocated记录点内存，，用于结束搜索后的释放
+        std::priority_queue<astarPoint*,std::vector<astarPoint*>,astarPoint::compareMin> openQueue;
+        std::unordered_set<astarPoint,astarPoint::Hash> clostList;
+        std::vector<astarPoint*> allocated;
+        astarPoint* start_astarPoint = new astarPoint(start.first,start.second);
+        start_astarPoint->g = 0;
+        start_astarPoint->h = 
+        start_astarPoint->f = 0;
+
+        // 基本初始化 起始节点入队
+        allocated.push_back(start_astarPoint);
+
+        clostList.insert(*start_astarPoint);
+        openQueue.push(start_astarPoint);
+
+        while (!openQueue.empty()){
+
+            // 开放队列出队，第一个为起始节点
+            astarPoint* current = openQueue.top();
+            openQueue.pop();
+
+            // 如果遍历到了终点，终止循环，回溯路径并返回
+            if (current->x == end.first && current->y == end.second){
+                std::vector<std::pair<int,int>> path;
+                while (current){
+                    path.push_back({current->x,current->y});
+                    current = current->parent;
+                }
+                // 释放openList
+                for (astarPoint* p : allocated){
+                    delete p;
+                }
+                return path;
+            }
+            
+            // 定义方向，上下左右
+            std::vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+            for (auto& d : directions){
+                // 定义一个新节点用来标记访问的邻点
+                int newX = current->x + d.first;
+                int newY = current->y + d.second;
+
+                // 确保在边界内，且无障碍物
+                if (newX >= 0 && newY >= 0 && 
+                    newX < width && newY < height && 
+                    map[newX][newY] == 0){
+
+                    // 确保没有访问过，如果已经访问过了，就直接跳过这个点，例如第一次遍历，以起始点右边的点为当前点，上下左右遍历到左的时候
+                    // 左边是起点，已经访问过了，所以就跳过，
+                    // 定义一个临时点，然后在闭合队列里查重，没找到就是没访问过
+                    // find函数会返回对应元素的迭代器，如果没有那就是end()
+                    // if中为没找到，迭代器不为end() true
+                    astarPoint probe(newX,newY);
+                    if(clostList.find(probe) != clostList.end()){
+                        continue;
+                    }
+
+                    // 闭合列表中没有重复，那就记录下dis和parent，入队openQueue和clostlist，以及记录数组
+                    astarPoint* newastarPoint = new astarPoint(newX,newY);
+
+                    // 和传统bfs主要区别就在有代价计算，bfs可以直接用已遍历过的区域边缘，而Astar就可以引入代价来遍历最接近的点
+                    newastarPoint->g = current->g + 1;
+                    newastarPoint->h = eular({newastarPoint->x,newastarPoint->y},end);
+                    newastarPoint->f = newastarPoint->g + newastarPoint->h;
+                    newastarPoint->parent = current;
+                    allocated.push_back(newastarPoint);
+
+                    clostList.insert(*newastarPoint);
+                    openQueue.push(newastarPoint);
+                }  
+            }
+        }
+
+        //没找到，清理队列退出
+        for (astarPoint* p : allocated){
             delete p;
         }
         return {};
     }
 
 
+
     
 private:
     std::vector<std::vector<int>> map;
+
+    float eular(std::pair<float,float> a,std::pair<float,float> b){
+        return sqrt(pow(a.first - b.first,2) + pow(a.second - b.second,2));
+    }
 };

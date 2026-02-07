@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "map_sreach.hpp"
 #include <iostream>
+#include <string>
 
 int main(){
     const int x = 180;
@@ -9,12 +10,14 @@ int main(){
     const int dx = 50;
     const int dy = 50;
 
+    std::pair<int,int> start = {1,1};
+    std::pair<int,int> end = {175,95};
+
     Map map(x,y,size);
     map.summonMaze(1,1,175,95,5,20,40);
 
-    auto path = map.bfsSreach({1,1},{175,95});
-
-    std::cout<<path.size()<<std::endl;
+    auto astar_path = map.astarSreach(start,end);
+    auto bfspath = map.bfsSreach(start,end);
 
     std::vector<std::vector<int>> okpMap = map.getMap();
     
@@ -30,6 +33,9 @@ int main(){
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
+        DrawText("bfs:YELLOW",50,10,40,YELLOW);
+        DrawText("astart:GREEN",500,10,40,GREEN);
+
         // 绘制网格地图
         float cellSize = map.size;
         for (int index_y = 0; index_y < map.height; index_y++){
@@ -43,8 +49,12 @@ int main(){
             }
         }
 
-        for (auto p : path){
+        for (auto p : astar_path){
             DrawRectangle( dx + p.first * cellSize, dy + p.second * cellSize, (int)map.size, (int)map.size, GREEN);
+        }
+
+        for (auto p : bfspath){
+            DrawRectangle( dx + p.first * cellSize, dy + p.second * cellSize, (int)map.size, (int)map.size, YELLOW);
         }
 
         DrawRectangle( dx + 1 * cellSize, dy + 1 * cellSize, (int)map.size, (int)map.size, RED);

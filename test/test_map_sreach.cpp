@@ -54,7 +54,7 @@ int main(){
         }
 
         for (auto p : bfspath){
-            DrawRectangle( dx + p.first * cellSize, dy + p.second * cellSize, (int)map.size, (int)map.size, YELLOW);
+            DrawRectangle(dx + p.first * cellSize, dy + p.second * cellSize, (int)map.size, (int)map.size, YELLOW);
         }
 
         DrawRectangle( dx + 1 * cellSize, dy + 1 * cellSize, (int)map.size, (int)map.size, RED);

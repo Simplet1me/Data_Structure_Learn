@@ -94,10 +94,39 @@ void seerSort(std::vector<T> &arr){
             }
         }
     }
-
-
-
-
-
-
 }
+
+/*
+5.快速排序 时间复杂度最好(nlog2n) 最差n^2 空间复杂度O(1)
+
+*/
+
+template <typename T>
+void quickSort(std::vector<T> &vec,int left ,int right){
+    if (left >= right){
+        return;
+    }
+    int pivot = partition(vec,left,right);
+    quickSort(vec,left,pivot - 1);
+    quickSort(vec,pivot + 1,right);
+}
+
+template <typename T>
+int partition(std::vector<T> &vec,int left ,int right){
+    int i = left;
+    int j = right;
+    while (i < j){
+        while (i < j && vec[j] >= vec[left]){
+            j--;
+        }
+        while (i < j && vec[i] <= vec[left]){
+            i++;
+        }
+        swap(&vec[i],&vec[j]);
+    }
+    //最后一遍左右指针重合，将枢纽数交换至对应位置，确保两边都能够符合规则，返回枢纽数索引
+    swap(&vec[i],&vec[left]);
+    return i;
+}
+
+

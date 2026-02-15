@@ -34,7 +34,12 @@ int main(){
     // printVector(arr,color::Type::Green);
 
     // seerSort test
+    // printVector(arr,color::Type::Blue);
+    // seerSort(arr);
+    // printVector(arr,color::Type::Green);
+
+    // quickSort test
     printVector(arr,color::Type::Blue);
-    seerSort(arr);
+    quickSort(arr,0,arr.size()-1);
     printVector(arr,color::Type::Green);
 }

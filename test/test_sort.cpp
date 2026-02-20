@@ -39,7 +39,12 @@ int main(){
     // printVector(arr,color::Type::Green);
 
     // quickSort test
+    // printVector(arr,color::Type::Blue);
+    // quickSort(arr,0,arr.size()-1);
+    // printVector(arr,color::Type::Green);
+
+    // mergeSort test
     printVector(arr,color::Type::Blue);
-    quickSort(arr,0,arr.size()-1);
+    mergeSort(arr,0,arr.size()-1);
     printVector(arr,color::Type::Green);
 }

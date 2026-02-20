@@ -98,7 +98,8 @@ void seerSort(std::vector<T> &arr){
 
 /*
 5.快速排序 时间复杂度最好(nlog2n) 最差n^2 空间复杂度O(1)
-
+选取任意一个数作为枢纽，每次划分新的枢纽会将枢纽放到对应位置，左边的一定小于枢纽，右边的一定大于枢纽
+再将左子和右子进行递归，直至数组长度为1
 */
 
 template <typename T>
@@ -130,3 +131,61 @@ int partition(std::vector<T> &vec,int left ,int right){
 }
 
 
+
+/*
+6.归并排序 时间复杂度(nlog2n)  空间复杂度O(n)
+自顶向下递归，直到划分为单个元素开始归并，然后逐层向上，完成排序
+*/
+
+template <typename T>
+void merge(std::vector<T> &vec, int left,int mid,int right){
+    std::vector<T> tmp(right - left + 1);
+    int i = left;
+    int j = mid + 1;
+    int k = 0;
+    // 左右子数组同时留有数据
+    while (i <= left && j <= right){
+        if(vec[i] <= vec[j]){
+            tmp[k] = vec[i];
+            k++;
+            i++;
+        }else {
+            tmp[k] = vec[j];
+            k++;
+            j++;
+        }
+    }
+
+    // 剩下左边的没归并
+    while (i <= mid){
+        tmp[k] = vec[i];
+        k++;
+        i++;
+    }
+
+    // 剩下右边的没归并
+    while (j <= right){
+        tmp[k] = vec[j];
+        k++;
+        j++;
+    }
+
+    // 返回原数组
+    for(k = 0;k < tmp.size();k++){
+        vec[left + k] = tmp[k];
+    }
+}
+
+template <typename T>
+void mergeSort(std::vector<T> &vec,int left,int right){
+    if (left >= right){
+        return;
+    }
+
+    // 划分归并区间
+    int mid = left + (right - left)/2;
+    mergeSort(vec,left,mid);
+    mergeSort(vec,mid+1,right);
+
+    merge(vec,left,mid,right);
+}

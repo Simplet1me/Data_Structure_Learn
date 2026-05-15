@@ -135,6 +135,7 @@ int partition(std::vector<T> &vec,int left ,int right){
 /*
 6.归并排序 时间复杂度(nlog2n)  空间复杂度O(n)
 自顶向下递归，直到划分为单个元素开始归并，然后逐层向上，完成排序
+这是稳定排序
 */
 
 template <typename T>

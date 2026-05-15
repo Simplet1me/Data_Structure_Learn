@@ -1,10 +1,11 @@
 #include <iostream>
 #include "console.hpp"
-#include "random.hpp"
+
+struct person{
+    
+};
+
 
 int main(){
-    console_init();
-    int a = 0;
-
-    a = 1;
+    
 }

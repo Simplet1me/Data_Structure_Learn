@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include <ctime>
 #include <cstdlib>
@@ -44,19 +45,25 @@ struct astarPoint{
     struct compareMin {
         bool operator()(astarPoint* a, astarPoint* b) {
         return a->f > b->f; 
-    }
-};
+        }
+    };
 };
 
+float eular(std::pair<float,float> a,std::pair<float,float> b){
+    return sqrt(pow(a.first - b.first,2) + pow(a.second - b.second,2));
+}
 
+float manhattan(std::pair<float,float> a,std::pair<float,float> b){
+    return abs(a.first - b.first) + abs(a.second - b.second);
+}
 
 
 class Map{
 public:
     int width;
     int height;
-    float size;
-    Map(int x,int y,float s){
+    int size;
+    Map(int x,int y,int s){
         width = x;
         height = y;
         size = s;
@@ -73,8 +80,8 @@ public:
         return map;
     }
 
-    void summonMaze(int start_x, int start_y, int end_x, int end_y,
-                    int minSize, int maxSize, int count){
+    void summonMaze(std::pair<int, int> start, std::pair<int, int> end,
+                    int minSize, int maxSize, int count,bool isClosed = false){
         // 初始化随机数种子
         static bool seeded = false;
         if (!seeded) {
@@ -89,6 +96,17 @@ public:
             }
         }
 
+        // 边界
+        for (size_t i = 0; i < width; i++){
+            map[i][0] = 1;
+            map[i][height - 1] = 1;
+        }
+        for (size_t j = 0; j < height; j++){
+            map[0][j] = 1;
+            map[width - 1][j] = 1;
+        }
+
+
         // 参数保护
         if (minSize < 1) minSize = 1;
         if (maxSize < minSize) maxSize = minSize;
@@ -100,22 +118,22 @@ public:
         while (placed < count && guard < maxGuard) {
             guard++;
 
-            int size = minSize + (rand() % (maxSize - minSize + 1));
-            if (size > width || size > height) continue;
+            int squareSize = minSize + (rand() % (maxSize - minSize + 1));
+            if (squareSize > width || squareSize > height) continue;
 
-            int x0 = rand() % (width - size + 1);
-            int y0 = rand() % (height - size + 1);
+            int x0 = rand() % (width - squareSize + 1);
+            int y0 = rand() % (height - squareSize + 1);
 
             // 检查是否覆盖起点/终点
-            bool coversStart = (start_x >= x0 && start_x < x0 + size &&
-                                start_y >= y0 && start_y < y0 + size);
-            bool coversEnd = (end_x >= x0 && end_x < x0 + size &&
-                              end_y >= y0 && end_y < y0 + size);
+            bool coversStart = (start.first >= x0 && start.first < x0 + squareSize &&
+                                start.second >= y0 && start.second < y0 + squareSize);
+            bool coversEnd = (end.first >= x0 && end.first < x0 + squareSize &&
+                              end.second >= y0 && end.second < y0 + squareSize);
             if (coversStart || coversEnd) continue;
 
             // 放置障碍物(1)
-            for (int x = x0; x < x0 + size; x++) {
-                for (int y = y0; y < y0 + size; y++) {
+            for (int x = x0; x < x0 + squareSize; x++) {
+                for (int y = y0; y < y0 + squareSize; y++) {
                     map[x][y] = 1;
                 }
             }
@@ -123,14 +141,32 @@ public:
             placed++;
         }
 
+        if (isClosed) {
+            // 以终点为中心，生成 5x5 空心围墙（仅外圈为障碍）
+            for (int dx = -2; dx <= 1; dx++) {
+                for (int dy = -2; dy <= 1; dy++) {
+                    bool isBorder = (std::abs(dx) == 2 || std::abs(dy) == 2);
+                    if (!isBorder) continue;
+
+                    int nx = end.first + dx;
+                    int ny = end.second + dy;
+
+                    if (nx >= 0 && ny >= 0 && nx < width && ny < height) {
+                        map[nx][ny] = 1;
+                    }
+                }
+            }
+        }
+
         // 确保起点终点可走
-        map[start_x][start_y] = 0;
-        map[end_x][end_y] = 0;
+        map[start.first][start.second] = 0;
+        map[end.first][end.second] = 0;
     }
 
 
     //BFS寻路
     std::vector<std::pair<int,int>> bfsSreach(std::pair<int,int> start,std::pair<int,int> end){
+        size_t times = 0;
         // openQueue存放将要访问的节点，clostList用来记录已经访问过的节点
         // allocated记录点内存，，用于结束搜索后的释放
         Queue<bfsPoint*> openQueue;
@@ -145,7 +181,7 @@ public:
         openQueue.push(start_bfsPoint);
 
         while (!openQueue.isEmpty()){
-
+            times++;
             // 开放队列出队，第一个为起始节点
             bfsPoint* current = openQueue.top();
             openQueue.pop();
@@ -161,11 +197,13 @@ public:
                 for (bfsPoint* p : allocated){
                     delete p;
                 }
+                std::cout << "bfs search times: " << times << std::endl;
                 return path;
             }
             
-            // 定义方向，上下左右
-            std::vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+            // 定义方向，上下左右八个方向
+            std::vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0},
+                                                           {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
             for (auto& d : directions){
                 // 定义一个新节点用来标记访问的邻点
                 int newX = current->x + d.first;
@@ -201,11 +239,14 @@ public:
         for (bfsPoint* p : allocated){
             delete p;
         }
+        std::cout << "bfs search fail!" << std::endl;
+        std::cout << "bfs search times: " << times << std::endl;
         return {};
     }
 
     //astar寻路
     std::vector<std::pair<int,int>> astarSreach(std::pair<int,int> start,std::pair<int,int> end){
+        size_t times = 0;
         // openQueue存放将要访问的节点，clostList用来记录已经访问过的节点
         // allocated记录点内存，，用于结束搜索后的释放
         std::priority_queue<astarPoint*,std::vector<astarPoint*>,astarPoint::compareMin> openQueue;
@@ -213,7 +254,7 @@ public:
         std::vector<astarPoint*> allocated;
         astarPoint* start_astarPoint = new astarPoint(start.first,start.second);
         start_astarPoint->g = 0;
-        start_astarPoint->h = 
+        start_astarPoint->h = eular(start,end);
         start_astarPoint->f = 0;
 
         // 基本初始化 起始节点入队
@@ -223,7 +264,7 @@ public:
         openQueue.push(start_astarPoint);
 
         while (!openQueue.empty()){
-
+            times++;
             // 开放队列出队，第一个为起始节点
             astarPoint* current = openQueue.top();
             openQueue.pop();
@@ -239,11 +280,14 @@ public:
                 for (astarPoint* p : allocated){
                     delete p;
                 }
+                std::cout << "astar search times: " << times << std::endl;
                 return path;
             }
             
-            // 定义方向，上下左右
-            std::vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+            // 定义方向，上下左右八个方向
+            std::vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0},
+                                                           {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+            
             for (auto& d : directions){
                 // 定义一个新节点用来标记访问的邻点
                 int newX = current->x + d.first;
@@ -268,7 +312,11 @@ public:
                     astarPoint* newastarPoint = new astarPoint(newX,newY);
 
                     // 和传统bfs主要区别就在有代价计算，bfs可以直接用已遍历过的区域边缘，而Astar就可以引入代价来遍历最接近的点
-                    newastarPoint->g = current->g + 1;
+                    if (d.first != 0 && d.second != 0){
+                        newastarPoint->g = current->g + 1.4; // 对角线距离
+                    } else {
+                        newastarPoint->g = current->g + 1; // 水平或垂直距离
+                    }
                     newastarPoint->h = eular({newastarPoint->x,newastarPoint->y},end);
                     newastarPoint->f = newastarPoint->g + newastarPoint->h;
                     newastarPoint->parent = current;
@@ -284,16 +332,11 @@ public:
         for (astarPoint* p : allocated){
             delete p;
         }
+        std::cout << "astar search fail!" << std::endl;
+        std::cout << "astar search times: " << times << std::endl;
         return {};
     }
 
-
-
-    
 private:
     std::vector<std::vector<int>> map;
-
-    float eular(std::pair<float,float> a,std::pair<float,float> b){
-        return sqrt(pow(a.first - b.first,2) + pow(a.second - b.second,2));
-    }
 };
